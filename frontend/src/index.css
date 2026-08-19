@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 font-sans selection:bg-amber-600/40 selection:text-amber-200 overflow-x-hidden;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.25);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.glass-panel-gold {
+  background: linear-gradient(135deg, rgba(30, 25, 20, 0.85) 0%, rgba(15, 20, 30, 0.9) 100%);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.parchment-card {
+  background: linear-gradient(145deg, #FBF8EE 0%, #EFE5CC 100%);
+  border: 1px solid #D6C29E;
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.parchment-card-dark {
+  background: linear-gradient(145deg, #1C1917 0%, #151312 100%);
+  border: 1px solid rgba(184, 150, 85, 0.25);
+}
+
+/* Typography styles */
+.font-kaithi {
+  font-family: "Noto Sans Kaithi", serif;
+  letter-spacing: 0.04em;
+}
+
+.font-devanagari {
+  font-family: "Noto Sans Devanagari", sans-serif;
+  line-height: 1.7;
+}
+
+/* Glow & Accent Animations */
+@keyframes goldPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+    border-color: rgba(212, 175, 55, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+    border-color: rgba(212, 175, 55, 0.5);
+  }
+}
+
+.pulse-gold {
+  animation: goldPulse 3s infinite ease-in-out;
+}
+
+/* Subtle pattern overlay */
+.bg-grid-pattern {
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
