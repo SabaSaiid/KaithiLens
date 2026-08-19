@@ -108,8 +108,8 @@ cd KaithiLens
 ./start.sh
 ```
 
-- 🖥️ **Web App UI:** [http://localhost:5173](http://localhost:5173)
-- 📡 **FastAPI Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- 🖥️ **Web App UI:** [http://localhost:5199](http://localhost:5199)
+- 📡 **FastAPI Docs:** [http://localhost:8844/docs](http://localhost:8844/docs)
 
 ---
 
@@ -123,12 +123,12 @@ cd backend
 python -m venv venv
 source venv/bin/activate       # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+uvicorn main:app --reload --port 8844
 
 # 2. Setup & Run the React Frontend (in a new terminal)
 cd frontend
 npm install
-npm run dev
+npm run dev -- --port 5199
 ```
 
 ### 🐳 Docker Compose

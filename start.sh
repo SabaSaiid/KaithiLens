@@ -6,6 +6,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+BACKEND_PORT=8844
+FRONTEND_PORT=5199
+
 echo "=========================================================="
 echo "📜 Starting KaithiLens Historical Manuscript Suite 👁️"
 echo "=========================================================="
@@ -39,18 +42,18 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # 4. Start FastAPI Backend API
-echo "🚀 Starting FastAPI backend on http://127.0.0.1:8000 (API Docs: http://127.0.0.1:8000/docs)..."
-PYTHONPATH=. backend/venv/bin/uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload &
+echo "🚀 Starting FastAPI backend on http://127.0.0.1:${BACKEND_PORT} (Docs: http://127.0.0.1:${BACKEND_PORT}/docs)..."
+PYTHONPATH=. backend/venv/bin/uvicorn backend.main:app --host 127.0.0.1 --port ${BACKEND_PORT} --reload &
 
 # 5. Start React Frontend Dev Server
-echo "✨ Starting React frontend on http://127.0.0.1:5173..."
+echo "✨ Starting React frontend on http://127.0.0.1:${FRONTEND_PORT}..."
 cd frontend
-npm run dev -- --host 127.0.0.1 --port 5173 &
+npm run dev -- --host 127.0.0.1 --port ${FRONTEND_PORT} &
 
 echo ""
 echo "🌟 KaithiLens is running!"
-echo "   🖥️  Web App:  http://127.0.0.1:5173"
-echo "   📡 API Docs: http://127.0.0.1:8000/docs"
+echo "   🖥️  Web App:  http://127.0.0.1:${FRONTEND_PORT}"
+echo "   📡 API Docs: http://127.0.0.1:${BACKEND_PORT}/docs"
 echo "   Press Ctrl+C to stop all servers."
 echo ""
 
