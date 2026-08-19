@@ -10,34 +10,48 @@ echo "=========================================================="
 echo "📜 Starting KaithiLens Historical Manuscript Suite 👁️"
 echo "=========================================================="
 
-# Check virtual environment
+# 1. Setup Backend Virtual Environment
 if [ ! -d "backend/venv" ]; then
-    echo "Creating backend virtualenv..."
+    echo "📦 Setting up Python virtual environment..."
     python3 -m venv backend/venv
+    backend/venv/bin/pip install --upgrade pip
     backend/venv/bin/pip install -r backend/requirements.txt
 fi
 
-# Generate sample images if needed
+# 2. Setup Frontend Dependencies
+if [ ! -d "frontend/node_modules" ]; then
+    echo "📦 Installing frontend npm dependencies..."
+    cd frontend && npm install && cd ..
+fi
+
+# 3. Generate Sample Manuscripts if needed
 if [ ! -f "datasets/sample_records/sample_land_deed_1.png" ]; then
-    echo "Generating sample historical manuscripts..."
+    echo "🎨 Generating sample historical manuscripts..."
     backend/venv/bin/python3 datasets/generate_sample_images.py
 fi
 
-# Kill any existing processes on ports 8000 and 5173 on exit
+# Clean exit handler
 cleanup() {
     echo ""
-    echo "Shutting down KaithiLens servers..."
+    echo "🛑 Shutting down KaithiLens servers..."
     kill $(jobs -p) 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
 
-# Start Backend API
-echo "Starting FastAPI backend on http://127.0.0.1:8000..."
+# 4. Start FastAPI Backend API
+echo "🚀 Starting FastAPI backend on http://127.0.0.1:8000 (API Docs: http://127.0.0.1:8000/docs)..."
 PYTHONPATH=. backend/venv/bin/uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload &
 
-# Start Frontend Dev Server
-echo "Starting React frontend on http://localhost:5173..."
+# 5. Start React Frontend Dev Server
+echo "✨ Starting React frontend on http://127.0.0.1:5173..."
 cd frontend
 npm run dev -- --host 127.0.0.1 --port 5173 &
+
+echo ""
+echo "🌟 KaithiLens is running!"
+echo "   🖥️  Web App:  http://127.0.0.1:5173"
+echo "   📡 API Docs: http://127.0.0.1:8000/docs"
+echo "   Press Ctrl+C to stop all servers."
+echo ""
 
 wait

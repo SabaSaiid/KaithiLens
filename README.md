@@ -91,37 +91,49 @@ This project is designed for historians, archivists, genealogists, and researche
 
 - Python 3.10+
 - Node.js 18+
-- Tesseract 5 installed on your system ([Installation Guide](https://tesseract-ocr.github.io/tessdoc/Installation.html))
 - Git
 
-### Installation
+---
+
+### ⚡ Quick Start (1-Click Shell Command)
+
+To automatically install dependencies and launch both the backend API and the React frontend workspace in one command:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/KaithiLens.git
+git clone https://github.com/SabaSaiid/KaithiLens.git
 cd KaithiLens
 
-# 2. Set up the Python backend
+# 2. Run the startup script
+./start.sh
+```
+
+- 🖥️ **Web App UI:** [http://localhost:5173](http://localhost:5173)
+- 📡 **FastAPI Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+### 🛠️ Manual Installation (Alternative)
+
+If you prefer to run services in separate terminal sessions:
+
+```bash
+# 1. Setup & Run the Python Backend
 cd backend
 python -m venv venv
 source venv/bin/activate       # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 
-# 3. Run the FastAPI server
-uvicorn main:app --reload
-# API will be live at http://localhost:8000
-
-# 4. Set up the React frontend (in a new terminal)
-cd ../frontend
+# 2. Setup & Run the React Frontend (in a new terminal)
+cd frontend
 npm install
 npm run dev
-# UI will be live at http://localhost:5173
 ```
 
-### Docker (Recommended)
+### 🐳 Docker Compose
 
 ```bash
-# Build and start all services at once
 docker-compose up --build
 ```
 
