@@ -11,6 +11,10 @@ app = FastAPI(
     title="KaithiLens API",
     description="End-to-end OCR, Transliteration & Translation Pipeline for Historical Kaithi Script Manuscripts.",
     version="1.0.0",
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
     docs_url="/docs",
     redoc_url="/redoc",
 )

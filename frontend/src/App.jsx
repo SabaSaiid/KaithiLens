@@ -9,6 +9,7 @@ import VirtualKeyboard from './components/VirtualKeyboard';
 import KaithiPrimerModal from './components/KaithiPrimerModal';
 import CommandPalette from './components/CommandPalette';
 import HistoryDrawer from './components/HistoryDrawer';
+import LicenseModal from './components/LicenseModal';
 import {
   Sparkles,
   Scroll,
@@ -47,6 +48,7 @@ export default function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [isPrimerOpen, setIsPrimerOpen] = useState(false);
+  const [isLicenseOpen, setIsLicenseOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
@@ -380,6 +382,10 @@ export default function App() {
               Keyboard
             </button>
             <span>•</span>
+            <button onClick={() => setIsLicenseOpen(true)} className="hover:text-amber-600 dark:hover:text-amber-300 transition-colors font-medium">
+              MIT License
+            </button>
+            <span>•</span>
             <a
               href="https://github.com/SabaSaiid/KaithiLens"
               target="_blank"
@@ -422,6 +428,11 @@ export default function App() {
         onClose={() => setIsPrimerOpen(false)}
       />
 
+      <LicenseModal
+        isOpen={isLicenseOpen}
+        onClose={() => setIsLicenseOpen(false)}
+      />
+
       <CommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
@@ -432,6 +443,7 @@ export default function App() {
         onOpenGlossary={() => setIsGlossaryOpen(true)}
         onOpenPrimer={() => setIsPrimerOpen(true)}
         onOpenKeyboard={() => setIsKeyboardOpen(true)}
+        onOpenLicense={() => setIsLicenseOpen(true)}
         onToggleTheme={toggleTheme}
         isDark={isDark}
       />

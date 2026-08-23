@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Sparkles,
   X,
+  Scale,
 } from 'lucide-react';
 
 export default function CommandPalette({
@@ -24,6 +25,7 @@ export default function CommandPalette({
   onOpenGlossary,
   onOpenPrimer,
   onOpenKeyboard,
+  onOpenLicense,
   onToggleTheme,
   isDark,
 }) {
@@ -99,6 +101,16 @@ export default function CommandPalette({
       icon: isDark ? Sun : Moon,
       action: () => {
         onToggleTheme();
+        onClose();
+      },
+    },
+    {
+      id: 'license',
+      title: 'Open Source MIT License & Legal Terms',
+      subtitle: 'View permissive rights, conditions, and scholarly ethics',
+      icon: Scale,
+      action: () => {
+        if (onOpenLicense) onOpenLicense();
         onClose();
       },
     },
