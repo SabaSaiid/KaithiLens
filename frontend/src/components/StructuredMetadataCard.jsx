@@ -70,24 +70,27 @@ ${(tenancy_parties || []).map((p) => `  • [${p.role}] ${p.entity}`).join('\n')
       'Chronology',
     ];
     const row = [
-      `"${document_type || ''}"`,
-      `"${geographic_jurisdiction?.district_zila || ''}"`,
-      `"${geographic_jurisdiction?.pargana || ''}"`,
-      `"${geographic_jurisdiction?.village_mauza || ''}"`,
-      `"${cadastral_metrics?.khata_number || ''}"`,
-      `"${cadastral_metrics?.khasra_plot || ''}"`,
-      `"${cadastral_metrics?.land_area || ''}"`,
-      `"${financial_terms?.annual_lagaan || ''}"`,
-      `"${chronology?.date_era || ''}"`,
+      `"${(document_type || '').replace(/"/g, '""')}"`,
+      `"${(geographic_jurisdiction?.district_zila || '').replace(/"/g, '""')}"`,
+      `"${(geographic_jurisdiction?.pargana || '').replace(/"/g, '""')}"`,
+      `"${(geographic_jurisdiction?.village_mauza || '').replace(/"/g, '""')}"`,
+      `"${(cadastral_metrics?.khata_number || '').replace(/"/g, '""')}"`,
+      `"${(cadastral_metrics?.khasra_plot || '').replace(/"/g, '""')}"`,
+      `"${(cadastral_metrics?.land_area || '').replace(/"/g, '""')}"`,
+      `"${(financial_terms?.annual_lagaan || '').replace(/"/g, '""')}"`,
+      `"${(chronology?.date_era || '').replace(/"/g, '""')}"`,
     ];
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), row.join(',')].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = [headers.join(','), row.join(',')].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `${documentTitle || 'Kaithi_Deed'}_Metadata.csv`);
+    link.href = url;
+    const safeTitle = (documentTitle || 'Kaithi_Deed').replace(/[^\w\s-]/gi, '').replace(/\s+/g, '_');
+    link.download = `${safeTitle}_Metadata.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (

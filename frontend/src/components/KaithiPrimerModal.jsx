@@ -19,13 +19,15 @@ const SCRIPT_EVOLUTION_EXAMPLES = [
   { braham: '𑀕', kaithi: '𑂏', deva: 'ग', latin: 'ga', meaning: 'Voiced velar stop' },
   { braham: '𑀘', kaithi: '𑂒', deva: 'च', latin: 'ca', meaning: 'Palatal stop' },
   { braham: '𑀚', kaithi: '𑂔', deva: 'ज', latin: 'ja', meaning: 'Voiced palatal stop' },
-  { braham: '𑀢', kaithi: '𑂝', deva: 'त', latin: 'ta', meaning: 'Dental stop' },
-  { braham: '𑀤', kaithi: '𑂟', deva: 'द', latin: 'da', meaning: 'Voiced dental stop' },
-  { braham: '𑀦', kaithi: '𑂡', deva: 'न', latin: 'na', meaning: 'Dental nasal' },
-  { braham: '𑀧', kaithi: '𑂢', deva: 'प', latin: 'pa', meaning: 'Bilabial stop' },
-  { braham: '𑀫', kaithi: '𑂦', deva: 'म', latin: 'ma', meaning: 'Bilabial nasal' },
-  { braham: '𑀭', kaithi: '𑂨', deva: 'र', latin: 'ra', meaning: 'Alveolar trill' },
-  { braham: '𑀮', kaithi: '𑂩', deva: 'ल', latin: 'la', meaning: 'Lateral approximant' },
+  { braham: '𑀢', kaithi: '𑂞', deva: 'त', latin: 'ta', meaning: 'Dental stop' },
+  { braham: '𑀤', kaithi: '𑂠', deva: 'द', latin: 'da', meaning: 'Voiced dental stop' },
+  { braham: '𑀦', kaithi: '𑂢', deva: 'न', latin: 'na', meaning: 'Dental nasal' },
+  { braham: '𑀧', kaithi: '𑂣', deva: 'प', latin: 'pa', meaning: 'Bilabial stop' },
+  { braham: '𑀫', kaithi: '𑂧', deva: 'म', latin: 'ma', meaning: 'Bilabial nasal' },
+  { braham: '𑀭', kaithi: '𑂩', deva: 'र', latin: 'ra', meaning: 'Alveolar trill' },
+  { braham: '𑀮', kaithi: '𑂪', deva: 'ल', latin: 'la', meaning: 'Lateral approximant' },
+  { braham: '𑀲', kaithi: '𑂮', deva: 'स', latin: 'sa', meaning: 'Dental sibilant' },
+  { braham: '𑀳', kaithi: '𑂯', deva: 'ह', latin: 'ha', meaning: 'Glottal fricative' },
 ];
 
 const HISTORICAL_MILESTONES = [

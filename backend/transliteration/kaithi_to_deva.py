@@ -8,7 +8,7 @@ virama/halant, nukta, and script-specific punctuation.
 from typing import Dict, List, Any, Tuple
 import unicodedata
 
-# Unicode Kaithi to Devanagari Mapping Dictionary
+# Official Unicode Kaithi to Devanagari Mapping Dictionary (Unicode Standard U+11080 to U+110C2)
 SCRIPT_MAPPING: Dict[str, str] = {
     # Various Signs
     "\U00011080": "\u0901",  # 𑂀 KAITHI SIGN CANDRABINDU -> ँ
@@ -41,56 +41,66 @@ SCRIPT_MAPPING: Dict[str, str] = {
     "\U00011097": "\u091F",  # 𑂗 KAITHI LETTER TTA -> ट
     "\U00011098": "\u0920",  # 𑂘 KAITHI LETTER TTHA -> ठ
     "\U00011099": "\u0921",  # 𑂙 KAITHI LETTER DDA -> ड
-    "\U0001109A": "\u0922",  # 𑂚 KAITHI LETTER DDHA -> ढ
-    "\U0001109B": "\u0921\u093C",  # 𑂛 KAITHI LETTER RRA -> ड़
-    "\U0001109C": "\u0923",  # 𑂜 KAITHI LETTER NNA -> ण
-    "\U0001109D": "\u0924",  # 𑂝 KAITHI LETTER TA -> त
-    "\U0001109E": "\u0925",  # 𑂞 KAITHI LETTER THA -> थ
-    "\U0001109F": "\u0926",  # 𑂟 KAITHI LETTER DA -> द
-    "\U000110A0": "\u0927",  # 𑂠 KAITHI LETTER DHA -> ध
-    "\U000110A1": "\u0928",  # 𑂡 KAITHI LETTER NA -> न
-    "\U000110A2": "\u092A",  # 𑂢 KAITHI LETTER PA -> प
-    "\U000110A3": "\u092B",  # 𑂣 KAITHI LETTER PHA -> फ
-    "\U000110A4": "\u092C",  # 𑂤 KAITHI LETTER BA -> ब
-    "\U000110A5": "\u092D",  # 𑂥 KAITHI LETTER BHA -> भ
-    "\U000110A6": "\u092E",  # 𑂦 KAITHI LETTER MA -> म
-    "\U000110A7": "\u092F",  # 𑂧 KAITHI LETTER YA -> य
-    "\U000110A8": "\u0930",  # 𑂨 KAITHI LETTER RA -> र
-    "\U000110A9": "\u0932",  # 𑂩 KAITHI LETTER LA -> ल
-    "\U000110AA": "\u0935",  # 𑂪 KAITHI LETTER VA -> व
-    "\U000110AB": "\u0936",  # 𑂫 KAITHI LETTER SHA -> श
-    "\U000110AC": "\u0937",  # 𑂬 KAITHI LETTER SSA -> ष
-    "\U000110AD": "\u0938",  # 𑂭 KAITHI LETTER SA -> स
-    "\U000110AE": "\u0939",  # 𑂮 KAITHI LETTER HA -> ह
+    "\U0001109A": "\u0921\u093C",  # 𑂚 KAITHI LETTER DDDHA -> ड़
+    "\U0001109B": "\u0922",  # 𑂛 KAITHI LETTER DDHA -> ढ
+    "\U0001109C": "\u0922\u093C",  # 𑂜 KAITHI LETTER RHA -> ढ़
+    "\U0001109D": "\u0923",  # 𑂝 KAITHI LETTER NNA -> ण
+    "\U0001109E": "\u0924",  # 𑂞 KAITHI LETTER TA -> त
+    "\U0001109F": "\u0925",  # 𑂟 KAITHI LETTER THA -> थ
+    "\U000110A0": "\u0926",  # 𑂠 KAITHI LETTER DA -> द
+    "\U000110A1": "\u0927",  # 𑂡 KAITHI LETTER DHA -> ध
+    "\U000110A2": "\u0928",  # 𑂢 KAITHI LETTER NA -> न
+    "\U000110A3": "\u092A",  # 𑂣 KAITHI LETTER PA -> प
+    "\U000110A4": "\u092B",  # 𑂤 KAITHI LETTER PHA -> फ
+    "\U000110A5": "\u092C",  # 𑂥 KAITHI LETTER BA -> ब
+    "\U000110A6": "\u092D",  # 𑂦 KAITHI LETTER BHA -> भ
+    "\U000110A7": "\u092E",  # 𑂧 KAITHI LETTER MA -> म
+    "\U000110A8": "\u092F",  # 𑂨 KAITHI LETTER YA -> य
+    "\U000110A9": "\u0930",  # 𑂩 KAITHI LETTER RA -> र
+    "\U000110AA": "\u0932",  # 𑂪 KAITHI LETTER LA -> ल
+    "\U000110AB": "\u0935",  # 𑂫 KAITHI LETTER VA -> व
+    "\U000110AC": "\u0936",  # 𑂬 KAITHI LETTER SHA -> श
+    "\U000110AD": "\u0937",  # 𑂭 KAITHI LETTER SSA -> ष
+    "\U000110AE": "\u0938",  # 𑂮 KAITHI LETTER SA -> स
+    "\U000110AF": "\u0939",  # 𑂯 KAITHI LETTER HA -> ह
 
     # Dependent Vowel Signs (Matras)
-    "\U000110AF": "\u093E",  # 𑂯 KAITHI VOWEL SIGN AA -> ा
-    "\U000110B0": "\u093F",  # 𑂰 KAITHI VOWEL SIGN I -> ि
-    "\U000110B1": "\u0940",  # 𑂱 KAITHI VOWEL SIGN II -> ी
-    "\U000110B2": "\u0941",  # 𑂲 KAITHI VOWEL SIGN U -> ु
-    "\U000110B3": "\u0942",  # 𑂳 KAITHI VOWEL SIGN UU -> ू
-    "\U000110B4": "\u0947",  # 𑂴 KAITHI VOWEL SIGN E -> े
-    "\U000110B5": "\u0948",  # 𑂵 KAITHI VOWEL SIGN AI -> ै
-    "\U000110B6": "\u094B",  # 𑂶 KAITHI VOWEL SIGN O -> ो
-    "\U000110B7": "\u094C",  # 𑂷 KAITHI VOWEL SIGN AU -> ौ
+    "\U000110B0": "\u093E",  # 𑂰 KAITHI VOWEL SIGN AA -> ा
+    "\U000110B1": "\u093F",  # 𑂱 KAITHI VOWEL SIGN I -> ि
+    "\U000110B2": "\u0940",  # 𑂲 KAITHI VOWEL SIGN II -> ी
+    "\U000110B3": "\u0941",  # 𑂳 KAITHI VOWEL SIGN U -> ु
+    "\U000110B4": "\u0942",  # 𑂴 KAITHI VOWEL SIGN UU -> ू
+    "\U000110B5": "\u0947",  # 𑂵 KAITHI VOWEL SIGN E -> े
+    "\U000110B6": "\u0948",  # 𑂶 KAITHI VOWEL SIGN AI -> ै
+    "\U000110B7": "\u094B",  # 𑂷 KAITHI VOWEL SIGN O -> ो
+    "\U000110B8": "\u094C",  # 𑂸 KAITHI VOWEL SIGN AU -> ौ
+    "\U000110C2": "\u0943",  # 𑃂 KAITHI VOWEL SIGN VOCALIC R -> ृ
 
     # Signs & Virama
-    "\U000110B8": "\u094D",  # 𑂸 KAITHI SIGN VIRAMA -> ्
-    "\U000110B9": "\u093C",  # 𑂹 KAITHI SIGN NUKTA -> ़
-    "\U000110BA": "\u0970",  # 𑂺 KAITHI SIGN ABBREVIATION -> ॰
-    "\U000110BB": "\u0970",  # 𑂻 KAITHI ENUMERATION SIGN -> ॰
-    "\U000110BC": "§",       # 𑂼 KAITHI SECTION MARK -> §
-    "\U000110BD": "§§",      # 𑂽 KAITHI DOUBLE SECTION MARK
-    "\U000110BE": "\u0964",  # 𑂾 KAITHI DANDA -> ।
-    "\U000110BF": "\u0965",  # 𑂿 KAITHI DOUBLE DANDA -> ॥
-    "\U000110C0": "—",       # 𑃀 KAITHI SIGN STROKE
+    "\U000110B9": "\u094D",  # 𑂹 KAITHI SIGN VIRAMA -> ्
+    "\U000110BA": "\u093C",  # 𑂺 KAITHI SIGN NUKTA -> ़
+    "\U000110BB": "\u0970",  # 𑂻 KAITHI ABBREVIATION SIGN -> ॰
+    "\U000110BC": "\u0970",  # 𑂼 KAITHI ENUMERATION SIGN -> ॰
+    "\U000110BD": "No.",     # 𑂽 KAITHI NUMBER SIGN
+    "\U000110BE": "\u0964",  # 𑂾 KAITHI SECTION MARK / DANDA ALIAS -> ।
+    "\U000110BF": "\u0965",  # 𑂿 KAITHI DOUBLE SECTION MARK / DOUBLE DANDA ALIAS -> ॥
+    "\U000110C0": "\u0964",  # 𑃀 KAITHI DANDA -> ।
+    "\U000110C1": "\u0965",  # 𑃁 KAITHI DOUBLE DANDA -> ॥
 }
 
 # Reverse Mapping Dictionary (Devanagari -> Kaithi)
-REVERSE_MAPPING: Dict[str, str] = {v: k for k, v in SCRIPT_MAPPING.items() if len(v) == 1}
-# Special multi-char reverse mappings
-REVERSE_MAPPING["\u0921\u093C"] = "\U0001109B"  # ड़ -> 𑂛
-REVERSE_MAPPING["\u095C"] = "\U0001109B"        # ड़ (precomposed) -> 𑂛
+REVERSE_MAPPING: Dict[str, str] = {}
+for k, v in SCRIPT_MAPPING.items():
+    if len(v) == 1 and v not in REVERSE_MAPPING:
+        REVERSE_MAPPING[v] = k
+
+# Explicit canonical reverse mappings
+REVERSE_MAPPING["\u0964"] = "\U000110C0"        # । (Danda) -> 𑃀 (or 𑂾)
+REVERSE_MAPPING["\u0965"] = "\U000110C1"        # ॥ (Double Danda) -> 𑃁 (or 𑂿)
+REVERSE_MAPPING["\u0921\u093C"] = "\U0001109A"  # ड़ -> 𑂚
+REVERSE_MAPPING["\u095C"] = "\U0001109A"        # ड़ (precomposed) -> 𑂚
+REVERSE_MAPPING["\u0922\u093C"] = "\U0001109C"  # ढ़ -> 𑂜
+REVERSE_MAPPING["\u095D"] = "\U0001109C"        # ढ़ (precomposed) -> 𑂜
 REVERSE_MAPPING[" "] = " "                      # Preserve space
 
 

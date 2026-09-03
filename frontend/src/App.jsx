@@ -280,9 +280,10 @@ export default function App() {
     }
   };
 
-  const handleApplyEditorChanges = ({ raw_kaithi, devanagari, english }) => {
+  const handleApplyEditorChanges = async ({ raw_kaithi, devanagari, english }) => {
     if (!pipelineResult) return;
 
+    // Apply primary text updates immediately
     setPipelineResult((prev) => ({
       ...prev,
       ocr: {
@@ -300,6 +301,56 @@ export default function App() {
     }));
 
     showToast('Applied archivist corrections to workspace');
+
+    // Concurrently fetch updated IAST Romanization, breakdown, and NER metadata
+    try {
+      const [translitRes, metaRes] = await Promise.all([
+        fetch('/api/transliterate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: raw_kaithi, direction: 'kaithi_to_deva' }),
+        }),
+        fetch('/api/metadata', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ devanagari_text: devanagari, english_text: english }),
+        }),
+      ]);
+
+      const updatedTranslit = translitRes.ok ? await translitRes.json() : null;
+      const updatedMeta = metaRes.ok ? await metaRes.json() : null;
+
+      // Extract matching glossary terms from glossaryData
+      const termsFound = [];
+      if (glossaryData) {
+        Object.entries(glossaryData).forEach(([term, info]) => {
+          if (devanagari.includes(term)) {
+            termsFound.push({
+              devanagari: term,
+              term_en: info.term_en,
+              category: info.category,
+              definition: info.definition,
+            });
+          }
+        });
+      }
+
+      setPipelineResult((prev) => ({
+        ...prev,
+        transliteration: {
+          ...prev.transliteration,
+          iast: updatedTranslit?.iast_text || prev.transliteration.iast,
+          character_breakdown: updatedTranslit?.character_breakdown || prev.transliteration.character_breakdown,
+        },
+        translation: {
+          ...prev.translation,
+          glossary_terms: termsFound.length > 0 ? termsFound : prev.translation.glossary_terms,
+        },
+        structured_metadata: updatedMeta?.structured_metadata || prev.structured_metadata,
+      }));
+    } catch (err) {
+      console.error('Failed to sync downstream metadata on editor apply:', err);
+    }
   };
 
   const handleSubmitFeedback = async (payload) => {

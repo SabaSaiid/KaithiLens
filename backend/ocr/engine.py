@@ -36,14 +36,14 @@ class OCRResult:
 # Pre-defined ground truth samples for historical manuscript demonstration & testing
 HISTORICAL_SAMPLES = {
     "sample_land_deed_1": {
-        "title": "Bhojpuri Land Sale Deed (𑂥𑂳𑂦𑂰 𑂪𑂰𑂍𑂸𑂨𑂧 𑂢𑂨𑂏𑂡𑂯 / 1894 CE)",
+        "title": "Bhojpuri Land Sale Deed (𑂦𑂴𑂧𑂱 𑂥𑂱𑂍𑂹𑂩𑂨 𑂠𑂮𑂹𑂞𑂰𑂫𑂵𑂔 / 1894 CE)",
         "region": "Shahabad District (Arrah, Bihar)",
         "date": "1894 CE (Samvat 1951)",
         "kaithi_text": (
-            "𑂫𑂸𑂨𑂱 𑂨𑂯𑂦 𑂔𑂱 𑂭𑂮𑂯𑂧 𑂾\n"
-            "𑂦𑂷𑂔𑂴 𑂨𑂯𑂦𑂢𑂲𑂨 𑂢𑂨𑂏𑂡𑂯 𑂃𑂨𑂨𑂮 𑂔𑂰𑂩𑂯 𑂫𑂯𑂮𑂯𑂤𑂯𑂟 𑂾\n"
-            "𑂍𑂵𑂞𑂱 𑂩𑂴𑂎𑂯 𑂤𑂯𑂤𑂝 𑂪𑂰𑂍𑂸𑂨𑂧 𑂤𑂯𑂏 𑂅𑂍𑂨𑂯𑂨𑂡𑂯𑂦𑂯 𑂾\n"
-            "𑂧𑂮 𑂟𑂭𑂸𑂝𑂯𑂪𑂴𑂔 𑂥𑂳𑂦𑂰 𑂔𑂦𑂱𑂁𑂟𑂯𑂨 𑂍𑂴 𑂮𑂍 𑂦𑂴𑂁 𑂩𑂰𑂎𑂩 𑂏𑂅𑂩 𑂮𑂯 𑂾"
+            "𑂬𑂹𑂩𑂲 𑂩𑂰𑂧 𑂔𑂲 𑂮𑂯𑂰𑂨 𑂾\n"
+            "𑂧𑂸𑂔𑂵 𑂩𑂰𑂧𑂣𑂳𑂩 𑂣𑂩𑂏𑂢𑂰 𑂃𑂩𑂩𑂯 𑂔𑂱𑂪𑂰 𑂬𑂰𑂯𑂰𑂥𑂰𑂠 𑂾\n"
+            "𑂍𑂶𑂟𑂲 𑂪𑂵𑂎𑂰 𑂥𑂰𑂥𑂞 𑂫𑂱𑂍𑂹𑂩𑂨 𑂥𑂰𑂏 𑂅𑂍𑂩𑂰𑂩𑂢𑂰𑂧𑂰 𑂾\n"
+            "𑂨𑂯 𑂠𑂮𑂹𑂞𑂰𑂫𑂵𑂔 𑂦𑂴𑂧𑂱 𑂔𑂧𑂲𑂁𑂠𑂰𑂩 𑂍𑂵 𑂯𑂍 𑂧𑂵𑂁 𑂪𑂱𑂎𑂪 𑂏𑂅𑂪 𑂯𑂰 𑂾"
         ),
         "devanagari_ground_truth": (
             "श्री राम जी सहाय ।\n"
@@ -59,13 +59,13 @@ HISTORICAL_SAMPLES = {
         ),
     },
     "sample_court_order_2": {
-        "title": "Patna Magistrate Court Order (𑂃𑂟𑂯𑂩𑂝 𑂮𑂲𑂍𑂲𑂦 / 1902 CE)",
+        "title": "Patna Magistrate Court Order (𑂃𑂠𑂰𑂪𑂞 𑂯𑂳𑂍𑂳𑂧 / 1902 CE)",
         "region": "Patna Division, Bengal Presidency",
         "date": "1902 CE",
         "kaithi_text": (
-            "𑂃𑂟𑂯𑂩𑂝 𑂦𑂰𑂭𑂰𑂩 𑂦𑂵𑂔𑂰𑂭𑂸𑂗𑂸𑂨𑂴𑂗 𑂤𑂮𑂯𑂟𑂲𑂨 𑂢𑂗𑂡𑂯 𑂾\n"
-            "𑂨𑂵𑂧𑂝 𑂍𑂴 𑂎𑂝𑂰𑂧𑂯𑂡 𑂟𑂯𑂎𑂰𑂩 𑂍𑂨𑂴 𑂍𑂴 𑂮𑂲𑂍𑂲𑂦 𑂟𑂰𑂮𑂩 𑂏𑂅𑂩 𑂾\n"
-            "𑂍𑂲𑂩 𑂨𑂍𑂤𑂯 𑂡𑂷 𑂤𑂱𑂐𑂯 𑂭𑂯𑂝 𑂍𑂘𑂸𑂘𑂯 𑂡𑂰𑂧𑂦 𑂃𑂡𑂲𑂭𑂯𑂨 𑂟𑂨𑂸𑂔 𑂥𑂅𑂩 𑂾"
+            "𑂃𑂠𑂰𑂪𑂞 𑂧𑂱𑂮𑂱𑂪 𑂧𑂶𑂔𑂱𑂮𑂹𑂗𑂹𑂩𑂵𑂗 𑂥𑂯𑂰𑂠𑂳𑂩 𑂣𑂗𑂢𑂰 𑂾\n"
+            "𑂩𑂶𑂨𑂞 𑂍𑂵 𑂎𑂞𑂱𑂨𑂰𑂢 𑂠𑂰𑂎𑂱𑂪 𑂍𑂩𑂵 𑂍𑂵 𑂯𑂳𑂍𑂳𑂧 𑂠𑂱𑂯𑂪 𑂏𑂅𑂪 𑂾\n"
+            "𑂍𑂳𑂪 𑂩𑂍𑂥𑂰 𑂢𑂸 𑂥𑂲𑂐𑂰 𑂮𑂰𑂞 𑂍𑂘𑂹𑂘𑂰 𑂢𑂱𑂨𑂧 𑂃𑂢𑂳𑂮𑂰𑂩 𑂠𑂩𑂹𑂔 𑂦𑂅𑂪 𑂾"
         ),
         "devanagari_ground_truth": (
             "अदालत मिसिल मैजिस्ट्रेट बहादुर पटना ।\n"
@@ -79,13 +79,13 @@ HISTORICAL_SAMPLES = {
         ),
     },
     "sample_khatiyan_3": {
-        "title": "Cadastral Survey Khatiyan (𑂎𑂝𑂯 𑂎𑂭𑂨𑂯 𑂨𑂯𑂠𑂹𑂠𑂰𑂬𑂹𑂞 / 1910 CE)",
+        "title": "Cadastral Survey Khatiyan (𑂎𑂞𑂱𑂨𑂰𑂢 𑂎𑂮𑂩𑂰 / 1910 CE)",
         "region": "Darbhanga, Mithila Region",
         "date": "1910 CE",
         "kaithi_text": (
-            "𑂎𑂝𑂯 𑂡𑂦𑂸𑂤𑂨 𑂤𑂯𑂧𑂱𑂭 𑂎𑂭𑂨𑂯 𑂭𑂷 𑂐𑂨 𑂾\n"
-            "𑂡𑂯𑂦 𑂍𑂯𑂫𑂸𑂝𑂍𑂯𑂨 𑂨𑂯𑂦 𑂭𑂲𑂁𑂟𑂨 𑂭𑂰𑂁𑂮 𑂾\n"
-            "𑂥𑂳𑂦𑂰 𑂍𑂴 𑂩𑂏𑂯𑂡 𑂭𑂯𑂩𑂯𑂡𑂯 𑂤𑂯𑂨𑂮 𑂨𑂲𑂢𑂧𑂯 𑂡𑂰𑂫𑂸𑂒𑂰𑂝 𑂥𑂅𑂩 𑂾"
+            "𑂎𑂞𑂰 𑂢𑂧𑂹𑂥𑂩 𑂥𑂰𑂨𑂲𑂮 𑂎𑂮𑂩𑂰 𑂮𑂸 𑂐𑂩 𑂾\n"
+            "𑂢𑂰𑂧 𑂍𑂰𑂬𑂹𑂞𑂍𑂰𑂩 𑂩𑂰𑂧 𑂮𑂳𑂁𑂠𑂩 𑂮𑂱𑂁𑂯 𑂾\n"
+            "𑂦𑂴𑂧𑂱 𑂍𑂵 𑂪𑂏𑂰𑂢 𑂮𑂰𑂪𑂰𑂢𑂰 𑂥𑂰𑂩𑂯 𑂩𑂳𑂣𑂨𑂰 𑂢𑂱𑂬𑂹𑂒𑂱𑂞 𑂦𑂅𑂪 𑂾"
         ),
         "devanagari_ground_truth": (
             "खता नम्बर बायीस खसरा सौ घर ।\n"

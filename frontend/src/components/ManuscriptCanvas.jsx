@@ -388,29 +388,30 @@ export default function ManuscriptCanvas({
               </div>
             )}
 
-            {/* Saved Region-of-Interest (ROI) Overlay */}
-            {savedRoi && (
-              <div
-                className="absolute border-2 border-emerald-400 bg-emerald-500/20 rounded shadow-[0_0_12px_#10b981] flex items-start justify-end p-1 pointer-events-auto"
-                style={{
-                  left: `${savedRoi.x}px`,
-                  top: `${savedRoi.y}px`,
-                  width: `${savedRoi.width}px`,
-                  height: `${savedRoi.height}px`,
-                }}
-              >
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSavedRoi(null);
-                  }}
-                  className="bg-black/70 hover:bg-black p-0.5 rounded text-white"
-                  title="Clear ROI Selection"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            )}
+          </div>
+        )}
+
+        {/* Saved Region-of-Interest (ROI) Overlay */}
+        {savedRoi && (
+          <div
+            className="absolute border-2 border-emerald-400 bg-emerald-500/20 rounded shadow-[0_0_12px_#10b981] flex items-start justify-end p-1 pointer-events-auto z-30"
+            style={{
+              left: `${savedRoi.x}px`,
+              top: `${savedRoi.y}px`,
+              width: `${savedRoi.width}px`,
+              height: `${savedRoi.height}px`,
+            }}
+          >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setSavedRoi(null);
+              }}
+              className="bg-black/70 hover:bg-black p-0.5 rounded text-white"
+              title="Clear ROI Selection"
+            >
+              <X className="w-3 h-3" />
+            </button>
           </div>
         )}
 

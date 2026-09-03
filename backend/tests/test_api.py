@@ -98,3 +98,19 @@ def test_feedback_endpoint():
     assert data["success"] is True
     assert "feedback_id" in data
 
+
+def test_convert_sample_endpoint():
+    response = client.post(
+        "/api/convert",
+        data={"sample_id": "sample_land_deed_1"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert "ocr" in data
+    assert "transliteration" in data
+    assert "translation" in data
+    assert "structured_metadata" in data
+    assert "श्री राम जी सहाय ।" in data["transliteration"]["devanagari"]
+
+

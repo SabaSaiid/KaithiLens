@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Volume2,
   VolumeX,
@@ -20,20 +20,49 @@ export default function InterlinearViewer({
   const [activeAudioLine, setActiveAudioLine] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Cancel any ongoing speech synthesis on unmount
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
   if (!pipelineResult) return null;
 
   const { ocr, transliteration, translation } = pipelineResult;
 
-  const kaithiLines = (ocr?.raw_kaithi || '').split('\n').filter(Boolean);
-  const devaLines = (transliteration?.devanagari || '').split('\n').filter(Boolean);
-  const iastLines = (transliteration?.iast || '').split('\n').filter(Boolean);
-  const englishLines = (translation?.english || '').split('\n').filter(Boolean);
+  // Split each script by newline while preserving line-by-line tier correspondence
+  const kaithiLines = (ocr?.raw_kaithi || '').split('\n');
+  const devaLines = (transliteration?.devanagari || '').split('\n');
+  const iastLines = (transliteration?.iast || '').split('\n');
+  const englishLines = (translation?.english || '').split('\n');
 
   const maxLines = Math.max(
     kaithiLines.length,
     devaLines.length,
+    iastLines.length,
     englishLines.length
   );
+
+  const linesList = [];
+  let verseCounter = 1;
+  for (let i = 0; i < maxLines; i++) {
+    const k = (kaithiLines[i] || '').trim();
+    const d = (devaLines[i] || '').trim();
+    const iast = (iastLines[i] || '').trim();
+    const en = (englishLines[i] || '').trim();
+    if (!k && !d && !en) continue;
+
+    linesList.push({
+      lineNum: verseCounter++,
+      kaithi: k,
+      deva: d,
+      iast: iast,
+      english: en,
+    });
+  }
 
   const handleCopy = (text, identifier) => {
     navigator.clipboard.writeText(text);
@@ -59,22 +88,11 @@ export default function InterlinearViewer({
     utterance.rate = 0.85;
 
     utterance.onstart = () => setActiveAudioLine(lineIdx);
-    utterance.onend = () => setActiveAudioLine(null);
-    utterance.onerror = () => setActiveAudioLine(null);
+    utterance.onend = () => setActiveAudioLine((prev) => (prev === lineIdx ? null : prev));
+    utterance.onerror = () => setActiveAudioLine((prev) => (prev === lineIdx ? null : prev));
 
     window.speechSynthesis.speak(utterance);
   };
-
-  const linesList = [];
-  for (let i = 0; i < maxLines; i++) {
-    linesList.push({
-      lineNum: i + 1,
-      kaithi: kaithiLines[i] || '',
-      deva: devaLines[i] || '',
-      iast: iastLines[i] || '',
-      english: englishLines[i] || '',
-    });
-  }
 
   const filteredLines = linesList.filter((item) => {
     if (!searchTerm) return true;

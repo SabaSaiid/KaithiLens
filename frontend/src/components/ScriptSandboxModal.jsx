@@ -13,8 +13,9 @@ import {
 import VirtualKeyboard from './VirtualKeyboard';
 
 export default function ScriptSandboxModal({ isOpen, onClose }) {
-  const [inputText, setInputText] = useState('𑂍𑂶𑂟𑂲 𑂩𑂵𑂎𑂰 𑂥𑂰𑂥𑂞 𑂫𑂱𑂍𑂹𑂩𑂨');
+  const [inputText, setInputText] = useState('𑂍𑂶𑂟𑂲 𑂪𑂵𑂎𑂰 𑂥𑂰𑂥𑂞 𑂫𑂱𑂍𑂹𑂩𑂨');
   const [direction, setDirection] = useState('kaithi_to_deva'); // 'kaithi_to_deva' | 'deva_to_kaithi'
+
   const [transliteratedText, setTransliteratedText] = useState('');
   const [iastText, setIastText] = useState('');
   const [breakdown, setBreakdown] = useState([]);
