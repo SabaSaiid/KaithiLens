@@ -40,6 +40,8 @@ def test_sample_detail_endpoint():
     assert "kaithi_text" in data
     assert "devanagari_text" in data
     assert "english_translation" in data
+    assert "iast_text" in data
+    assert "structured_metadata" in data
 
 
 def test_transliterate_endpoint():
@@ -51,6 +53,7 @@ def test_transliterate_endpoint():
     data = response.json()
     assert data["transliterated_text"] == "कखग"
     assert len(data["character_breakdown"]) == 3
+    assert "iast_text" in data
 
 
 def test_translate_endpoint():
@@ -62,6 +65,23 @@ def test_translate_endpoint():
     data = response.json()
     assert "Village Rampur" in data["translated_text"]
     assert len(data["glossary_terms_found"]) > 0
+
+
+def test_metadata_endpoint():
+
+    response = client.post(
+        "/api/metadata",
+        json={
+            "devanagari_text": "मौजे रामपुर परगना अररह जिला शाहाबाद । कैथी लेखा बाबत विक्रय बाग इकरारनामा ।",
+            "english_text": "Village Rampur, Pargana Arrah, District Shahabad.",
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "structured_metadata" in data
+    meta = data["structured_metadata"]
+    assert "document_type" in meta
+    assert meta["geographic_jurisdiction"]["district_zila"] == "Shahabad (शाहाबाद)"
 
 
 def test_feedback_endpoint():
@@ -77,3 +97,4 @@ def test_feedback_endpoint():
     data = response.json()
     assert data["success"] is True
     assert "feedback_id" in data
+

@@ -10,6 +10,8 @@ import {
   Github,
   Sparkles,
   Search,
+  Terminal,
+  HelpCircle,
 } from 'lucide-react';
 
 export default function Header({
@@ -20,9 +22,12 @@ export default function Header({
   onOpenPrimer,
   onOpenHistory,
   onOpenCommandPalette,
+  onOpenSandbox,
+  onOpenShortcuts,
   backendHealth,
   historyCount = 0,
 }) {
+
   return (
     <header className="sticky top-0 z-40 w-full glass-panel border-b border-amber-500/20 px-4 sm:px-6 py-3.5 transition-all">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -89,6 +94,18 @@ export default function Header({
             <span className="hidden sm:inline">Keyboard</span>
           </button>
 
+          {/* Script Sandbox */}
+          {onOpenSandbox && (
+            <button
+              onClick={onOpenSandbox}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-200/70 hover:bg-amber-500/20 dark:bg-slate-900/80 dark:hover:bg-amber-500/20 border border-slate-300/80 dark:border-slate-700/80 text-xs font-medium text-slate-700 dark:text-slate-200 hover:text-amber-700 dark:hover:text-amber-200 transition-all shadow-sm"
+              title="Interactive Kaithi Script Sandbox (Scratchpad)"
+            >
+              <Terminal className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span className="hidden sm:inline">Sandbox</span>
+            </button>
+          )}
+
           {/* Lexicon / Glossary */}
           <button
             onClick={onOpenGlossary}
@@ -98,6 +115,18 @@ export default function Header({
             <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400" />
             <span className="hidden sm:inline">Lexicon</span>
           </button>
+
+          {/* Shortcuts Guide */}
+          {onOpenShortcuts && (
+            <button
+              onClick={onOpenShortcuts}
+              className="p-2 rounded-xl bg-slate-200/70 hover:bg-amber-500/20 dark:bg-slate-900/80 dark:hover:bg-amber-500/20 border border-slate-300/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-300 transition-colors"
+              title="Keyboard Shortcuts Guide (?)"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </button>
+          )}
+
 
           {/* Session History Drawer */}
           <button

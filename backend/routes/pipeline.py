@@ -11,6 +11,8 @@ from ..ocr.engine import OCREngine, HISTORICAL_SAMPLES
 from ..transliteration.kaithi_to_deva import (
     kaithi_to_devanagari,
     devanagari_to_kaithi,
+    devanagari_to_iast,
+    kaithi_to_iast,
     is_kaithi_text,
     get_character_breakdown,
 )
@@ -36,6 +38,13 @@ class TransliterationResponse(BaseModel):
     transliterated_text: str
     direction: str
     character_breakdown: List[Dict[str, Any]]
+    iast_text: Optional[str] = None
+
+
+class MetadataRequest(BaseModel):
+    devanagari_text: str = Field(..., description="Devanagari text to analyze")
+    english_text: Optional[str] = Field("", description="English translation if available")
+
 
 
 class TranslationRequest(BaseModel):
@@ -97,16 +106,20 @@ def get_sample_detail(sample_id: str):
         raise HTTPException(status_code=404, detail="Sample record not found")
 
     sample = HISTORICAL_SAMPLES[sample_id]
+    devanagari_text = sample["devanagari_ground_truth"]
+    english_translation = sample["english_translation"]
     return {
         "id": sample_id,
         "title": sample["title"],
         "region": sample["region"],
         "date": sample["date"],
         "kaithi_text": sample["kaithi_text"],
-        "devanagari_text": sample["devanagari_ground_truth"],
-        "english_translation": sample["english_translation"],
+        "devanagari_text": devanagari_text,
+        "iast_text": devanagari_to_iast(devanagari_text),
+        "english_translation": english_translation,
         "character_breakdown": get_character_breakdown(sample["kaithi_text"]),
-        "glossary_terms": translator.find_glossary_terms(sample["devanagari_ground_truth"]),
+        "glossary_terms": translator.find_glossary_terms(devanagari_text),
+        "structured_metadata": translator.extract_deed_metadata(devanagari_text, english_translation),
     }
 
 
@@ -118,13 +131,15 @@ def get_historical_glossary():
 
 @router.post("/transliterate", response_model=TransliterationResponse)
 def transliterate_text(payload: TransliterationRequest):
-    """Convert text between Kaithi and Devanagari scripts."""
+    """Convert text between Kaithi and Devanagari scripts with IAST Romanization."""
     if payload.direction == "kaithi_to_deva":
         result_text = kaithi_to_devanagari(payload.text)
         breakdown = get_character_breakdown(payload.text)
+        iast_text = devanagari_to_iast(result_text)
     elif payload.direction == "deva_to_kaithi":
         result_text = devanagari_to_kaithi(payload.text)
         breakdown = get_character_breakdown(result_text)
+        iast_text = devanagari_to_iast(payload.text)
     else:
         raise HTTPException(status_code=400, detail="Invalid direction specified. Choose 'kaithi_to_deva' or 'deva_to_kaithi'")
 
@@ -133,6 +148,7 @@ def transliterate_text(payload: TransliterationRequest):
         transliterated_text=result_text,
         direction=payload.direction,
         character_breakdown=breakdown,
+        iast_text=iast_text,
     )
 
 
@@ -148,6 +164,13 @@ def translate_text(payload: TranslationRequest):
     )
 
 
+@router.post("/metadata")
+def extract_metadata_endpoint(payload: MetadataRequest):
+    """Extract structured historical deed metadata (NER) from Devanagari & English text."""
+    meta = translator.extract_deed_metadata(payload.devanagari_text, payload.english_text or "")
+    return {"structured_metadata": meta}
+
+
 @router.post("/convert")
 async def convert_document(
     file: Optional[UploadFile] = File(None),
@@ -155,7 +178,7 @@ async def convert_document(
 ):
     """
     End-to-End Pipeline:
-    Upload Document -> Image Preprocessing -> OCR -> Transliteration -> Translation
+    Upload Document -> Image Preprocessing -> OCR -> Transliteration -> Translation -> Metadata Extraction
     """
     image_bytes = None
     if file:
@@ -180,12 +203,16 @@ async def convert_document(
     # 2. OCR Text Extraction
     ocr_result = ocr_engine.extract_text(binarized_img, sample_id=sample_id)
 
-    # 3. Transliteration (Kaithi -> Devanagari)
+    # 3. Transliteration (Kaithi -> Devanagari & IAST)
     devanagari_text = kaithi_to_devanagari(ocr_result.raw_kaithi_text)
+    iast_text = devanagari_to_iast(devanagari_text)
     char_breakdown = get_character_breakdown(ocr_result.raw_kaithi_text)
 
     # 4. Translation (Devanagari -> English)
     translation_result = translator.translate(devanagari_text, target_lang="en")
+
+    # 5. Deed Intelligence / NER Metadata Extraction
+    structured_metadata = translator.extract_deed_metadata(devanagari_text, translation_result.translated_text)
 
     return {
         "success": True,
@@ -209,6 +236,7 @@ async def convert_document(
         },
         "transliteration": {
             "devanagari": devanagari_text,
+            "iast": iast_text,
             "character_breakdown": char_breakdown,
         },
         "translation": {
@@ -216,7 +244,9 @@ async def convert_document(
             "engine_used": translation_result.engine_used,
             "glossary_terms": translation_result.glossary_terms_found,
         },
+        "structured_metadata": structured_metadata,
     }
+
 
 
 @router.post("/feedback")

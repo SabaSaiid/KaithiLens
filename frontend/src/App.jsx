@@ -10,6 +10,9 @@ import KaithiPrimerModal from './components/KaithiPrimerModal';
 import CommandPalette from './components/CommandPalette';
 import HistoryDrawer from './components/HistoryDrawer';
 import LicenseModal from './components/LicenseModal';
+import ScriptSandboxModal from './components/ScriptSandboxModal';
+import DocumentDiffModal from './components/DocumentDiffModal';
+import ShortcutsModal from './components/ShortcutsModal';
 import {
   Sparkles,
   Scroll,
@@ -36,6 +39,7 @@ export default function App() {
   const [samples, setSamples] = useState([]);
   const [selectedSampleId, setSelectedSampleId] = useState('sample_land_deed_1');
   const [pipelineResult, setPipelineResult] = useState(null);
+  const [baselineOcrText, setBaselineOcrText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStage, setCurrentStage] = useState('');
   const [backendHealth, setBackendHealth] = useState(null);
@@ -51,6 +55,10 @@ export default function App() {
   const [isLicenseOpen, setIsLicenseOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isSandboxOpen, setIsSandboxOpen] = useState(false);
+  const [isDiffOpen, setIsDiffOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+
 
   // Session History State
   const [historyItems, setHistoryItems] = useState(() => {
@@ -88,20 +96,45 @@ export default function App() {
     showToast(`Switched to ${!isDark ? 'Nocturne Dark' : 'Heritage Parchment'} Mode`);
   };
 
-  // Global Keyboard Shortcuts (Cmd+K, etc.)
+  // Global Keyboard Shortcuts (Cmd+K, Cmd+S, Cmd+E, Cmd+D, ?, Esc)
   useEffect(() => {
     const handleKeyDown = (e) => {
+      const activeTag = document.activeElement?.tagName;
+      const isTyping = activeTag === 'INPUT' || activeTag === 'TEXTAREA';
+
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setIsCommandPaletteOpen((prev) => !prev);
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        setIsSandboxOpen((prev) => !prev);
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
+        e.preventDefault();
+        setIsEditorOpen((prev) => !prev);
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+        e.preventDefault();
+        setIsDiffOpen((prev) => !prev);
+      } else if (e.key === '?' && !isTyping) {
+        e.preventDefault();
+        setIsShortcutsOpen((prev) => !prev);
       } else if (e.key === 'Escape') {
         setIsCommandPaletteOpen(false);
         setIsHistoryOpen(false);
+        setIsEditorOpen(false);
+        setIsGlossaryOpen(false);
+        setIsExportOpen(false);
+        setIsKeyboardOpen(false);
+        setIsPrimerOpen(false);
+        setIsLicenseOpen(false);
+        setIsSandboxOpen(false);
+        setIsDiffOpen(false);
+        setIsShortcutsOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
 
   // Save to Session History
   const saveSessionToHistory = (title, result) => {
@@ -128,10 +161,12 @@ export default function App() {
 
   const handleRestoreHistoryItem = (item) => {
     setPipelineResult(item.pipelineResult);
+    setBaselineOcrText(item.pipelineResult?.ocr?.raw_kaithi || '');
     setSelectedSampleId(null);
     setOriginalImagePreview(null);
     showToast(`Restored: ${item.title}`);
   };
+
 
   // Fetch initial data: Health, Samples, Glossary
   useEffect(() => {
@@ -189,6 +224,7 @@ export default function App() {
 
       const data = await res.json();
       setPipelineResult(data);
+      setBaselineOcrText(data?.ocr?.raw_kaithi || '');
       setOriginalImagePreview(null);
       const title = samples.find((s) => s.id === sampleId)?.title || 'Historical Document';
       showToast(`Loaded ${title}`);
@@ -230,9 +266,11 @@ export default function App() {
 
       const data = await res.json();
       setPipelineResult(data);
+      setBaselineOcrText(data?.ocr?.raw_kaithi || '');
       const title = file.name || 'Uploaded Historical Manuscript';
       showToast('Manuscript digitized & translated successfully!');
       saveSessionToHistory(title, data);
+
     } catch (err) {
       console.error('Upload conversion error:', err);
       showToast('Failed to process image file.', 'error');
@@ -301,6 +339,8 @@ export default function App() {
         onOpenPrimer={() => setIsPrimerOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenSandbox={() => setIsSandboxOpen(true)}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
         backendHealth={backendHealth}
         historyCount={historyItems.length}
       />
@@ -355,13 +395,17 @@ export default function App() {
             <PipelineViewer
               pipelineResult={pipelineResult}
               originalImagePreview={originalImagePreview}
+              documentTitle={getActiveTitle()}
               onOpenEditor={() => setIsEditorOpen(true)}
               onOpenExport={() => setIsExportOpen(true)}
               onOpenGlossary={() => setIsGlossaryOpen(true)}
+              onOpenDiff={() => setIsDiffOpen(true)}
+              onOpenSandbox={() => setIsSandboxOpen(true)}
             />
           </section>
         )}
       </main>
+
 
       {/* Footer */}
       <footer className="w-full border-t border-slate-300 dark:border-slate-800 bg-slate-100/90 dark:bg-slate-950/90 py-6 px-6 text-center text-xs text-slate-500 dark:text-slate-400 z-10">
@@ -444,9 +488,39 @@ export default function App() {
         onOpenPrimer={() => setIsPrimerOpen(true)}
         onOpenKeyboard={() => setIsKeyboardOpen(true)}
         onOpenLicense={() => setIsLicenseOpen(true)}
+        onOpenSandbox={() => setIsSandboxOpen(true)}
+        onOpenDiff={() => setIsDiffOpen(true)}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onToggleTheme={toggleTheme}
         isDark={isDark}
       />
+
+      <ScriptSandboxModal
+        isOpen={isSandboxOpen}
+        onClose={() => setIsSandboxOpen(false)}
+      />
+
+      <DocumentDiffModal
+        isOpen={isDiffOpen}
+        onClose={() => setIsDiffOpen(false)}
+        originalText={baselineOcrText}
+        editedText={pipelineResult?.ocr?.raw_kaithi}
+        documentTitle={getActiveTitle()}
+        onRestoreOriginal={() => {
+          handleApplyEditorChanges({
+            raw_kaithi: baselineOcrText,
+            devanagari: pipelineResult?.transliteration?.devanagari,
+            english: pipelineResult?.translation?.english,
+          });
+          showToast('Restored transcription to original AI baseline');
+        }}
+      />
+
+      <ShortcutsModal
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
+      />
+
 
       <HistoryDrawer
         isOpen={isHistoryOpen}

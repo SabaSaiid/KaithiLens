@@ -12,25 +12,32 @@ import {
   Scroll,
   QrCode,
   Landmark,
+  BookOpen,
+  Table,
+  Quote,
 } from 'lucide-react';
 
 export default function ExportModal({ isOpen, onClose, pipelineResult, documentTitle }) {
   const [copied, setCopied] = useState(false);
-  const [activePreviewFormat, setActivePreviewFormat] = useState('text'); // 'text' | 'tei' | 'md' | 'json'
+  const [activePreviewFormat, setActivePreviewFormat] = useState('text'); // 'text' | 'tei' | 'md' | 'json' | 'csv' | 'citation'
+  const [citationStyle, setCitationStyle] = useState('chicago'); // 'chicago' | 'apa' | 'bibtex' | 'mla'
 
   if (!isOpen || !pipelineResult) return null;
 
-  const { preprocessing, ocr, transliteration, translation } = pipelineResult;
-  const docTitle = documentTitle || 'KaithiLens_Transcription_Record';
+  const { preprocessing, ocr, transliteration, translation, structured_metadata } = pipelineResult;
+  const docTitle = documentTitle || 'Historical Kaithi Manuscript Record';
+  const currentYear = new Date().getFullYear();
 
   const generatePlainText = () => {
     return `===============================================================
 KAITHILENS HISTORICAL MANUSCRIPT ARCHIVAL REPORT
 ===============================================================
 Document Title: ${docTitle}
+Classification: ${structured_metadata?.document_type || 'Historical Legal Record'}
+Jurisdiction: ${structured_metadata?.geographic_jurisdiction?.district_zila || 'Bihar'} (Mauza: ${structured_metadata?.geographic_jurisdiction?.village_mauza || 'N/A'})
 OCR Confidence: ${Math.round((ocr?.confidence || 0.95) * 100)}%
 Vision Model Engine: ${ocr?.engine || 'KaithiLens Neural Vision Model'}
-Timestamp: ${new Date().toUTCString()}
+Export Date: ${new Date().toUTCString()}
 
 ---------------------------------------------------------------
 1. ORIGINAL KAITHI TRANSCRIPTION (𑂍𑂶𑂟𑂲)
@@ -38,17 +45,34 @@ Timestamp: ${new Date().toUTCString()}
 ${ocr?.raw_kaithi || ''}
 
 ---------------------------------------------------------------
-2. DEVANAGARI TRANSLITERATION (देवनागरी)
+2. IAST ROMANIZATION (ISO 15919)
+---------------------------------------------------------------
+${transliteration?.iast || ''}
+
+---------------------------------------------------------------
+3. DEVANAGARI TRANSLITERATION (देवनागरी)
 ---------------------------------------------------------------
 ${transliteration?.devanagari || ''}
 
 ---------------------------------------------------------------
-3. ENGLISH SEMANTIC TRANSLATION
+4. ENGLISH SEMANTIC TRANSLATION
 ---------------------------------------------------------------
 ${translation?.english || ''}
 
 ---------------------------------------------------------------
-4. DETECTED HISTORICAL & LEGAL GLOSSARY TERMS
+5. STRUCTURED DEED ENTITIES (NER)
+---------------------------------------------------------------
+• Mauza / Village: ${structured_metadata?.geographic_jurisdiction?.village_mauza || 'N/A'}
+• Pargana: ${structured_metadata?.geographic_jurisdiction?.pargana || 'N/A'}
+• District / Zila: ${structured_metadata?.geographic_jurisdiction?.district_zila || 'N/A'}
+• Khasra Plot: ${structured_metadata?.cadastral_metrics?.khasra_plot || 'N/A'}
+• Khata No.: ${structured_metadata?.cadastral_metrics?.khata_number || 'N/A'}
+• Holding Area: ${structured_metadata?.cadastral_metrics?.land_area || 'N/A'}
+• Annual Lagaan: ${structured_metadata?.financial_terms?.annual_lagaan || 'N/A'}
+• Era / Date: ${structured_metadata?.chronology?.date_era || 'N/A'}
+
+---------------------------------------------------------------
+6. DETECTED HISTORICAL & LEGAL GLOSSARY TERMS
 ---------------------------------------------------------------
 ${(translation?.glossary_terms || [])
   .map((t) => `• ${t.term_en} (${t.devanagari}) [${t.category}]: ${t.definition}`)
@@ -68,20 +92,37 @@ Preserved with KaithiLens — Open Source Heritage Architecture (MIT License)
 
 ---
 
-## 1. Kaithi Script Transcription (𑂍𑂶𑂟𑂲)
+## 1. Structured Deed Summary
+| Attribute | Value |
+| :--- | :--- |
+| **Classification** | ${structured_metadata?.document_type || 'Historical Legal Record'} |
+| **District (Zila)** | ${structured_metadata?.geographic_jurisdiction?.district_zila || 'Bihar'} |
+| **Pargana** | ${structured_metadata?.geographic_jurisdiction?.pargana || 'N/A'} |
+| **Village (Mauza)** | ${structured_metadata?.geographic_jurisdiction?.village_mauza || 'N/A'} |
+| **Cadastral Plot (Khasra)** | ${structured_metadata?.cadastral_metrics?.khasra_plot || 'N/A'} |
+| **Holding Area** | ${structured_metadata?.cadastral_metrics?.land_area || 'N/A'} |
+| **Annual Lagaan (Rent)** | ${structured_metadata?.financial_terms?.annual_lagaan || 'N/A'} |
+| **Dating & Era** | ${structured_metadata?.chronology?.date_era || 'N/A'} |
+
+---
+
+## 2. Kaithi Script Transcription (𑂍𑂶𑂟𑂲)
 \`\`\`kaithi
 ${ocr?.raw_kaithi || ''}
 \`\`\`
 
-## 2. Devanagari Transliteration (देवनागरी)
+## 3. IAST Romanization (ISO 15919)
+*${(transliteration?.iast || '').replace(/\n/g, '*  \n*')}*
+
+## 4. Devanagari Transliteration (देवनागरी)
 \`\`\`devanagari
 ${transliteration?.devanagari || ''}
 \`\`\`
 
-## 3. English Semantic Translation
+## 5. English Semantic Translation
 ${translation?.english || ''}
 
-## 4. Archival Lexicon & Land Revenue Annotations
+## 6. Archival Lexicon & Land Revenue Annotations
 | Term (Devanagari) | English | Category | Definition |
 | :--- | :--- | :--- | :--- |
 ${(translation?.glossary_terms || [])
@@ -101,18 +142,18 @@ ${(translation?.glossary_terms || [])
       <titleStmt>
         <title>${docTitle}</title>
         <respStmt>
-          <resp>Digitized and Transliterated by</resp>
+          <resp>Digitized, Transliterated &amp; Translated by</resp>
           <name>KaithiLens Digital Humanities Pipeline</name>
         </respStmt>
       </titleStmt>
       <publicationStmt>
-        <p>Digitized Archive Record (${new Date().getFullYear()})</p>
+        <p>Digitized Archive Record (${currentYear})</p>
         <availability status="free">
-          <licence target="https://opensource.org/licenses/MIT">Licensed under the MIT Open Source License.</licence>
+          <licence target="https://opensource.org/licenses/MIT">Licensed under MIT License.</licence>
         </availability>
       </publicationStmt>
       <sourceDesc>
-        <p>Historical Manuscript from Bihar/UP Land Records</p>
+        <p>Historical Manuscript from Bihar/UP Land Records (${structured_metadata?.chronology?.date_era || 'c. 1890-1910'})</p>
       </sourceDesc>
     </fileDesc>
   </teiHeader>
@@ -121,7 +162,10 @@ ${(translation?.glossary_terms || [])
       <div type="transcription" xml:lang="bho-Kthi">
         <p>${(ocr?.raw_kaithi || '').replace(/\n/g, '<lb/>\n        ')}</p>
       </div>
-      <div type="transliteration" xml:lang="hi-Deva">
+      <div type="transliteration-iast" xml:lang="bho-Latn">
+        <p>${(transliteration?.iast || '').replace(/\n/g, '<lb/>\n        ')}</p>
+      </div>
+      <div type="transliteration-deva" xml:lang="hi-Deva">
         <p>${(transliteration?.devanagari || '').replace(/\n/g, '<lb/>\n        ')}</p>
       </div>
       <div type="translation" xml:lang="en">
@@ -130,6 +174,47 @@ ${(translation?.glossary_terms || [])
     </body>
   </text>
 </TEI>`;
+  };
+
+  const generateCSV = () => {
+    const kLines = (ocr?.raw_kaithi || '').split('\n');
+    const iLines = (transliteration?.iast || '').split('\n');
+    const dLines = (transliteration?.devanagari || '').split('\n');
+    const eLines = (translation?.english || '').split('\n');
+    const max = Math.max(kLines.length, dLines.length, eLines.length);
+
+    let rows = ['Line_Number,Kaithi_Unicode,IAST_Romanization,Devanagari_Transliteration,English_Translation'];
+    for (let i = 0; i < max; i++) {
+      const k = (kLines[i] || '').replace(/"/g, '""');
+      const iast = (iLines[i] || '').replace(/"/g, '""');
+      const d = (dLines[i] || '').replace(/"/g, '""');
+      const e = (eLines[i] || '').replace(/"/g, '""');
+      rows.push(`${i + 1},"${k}","${iast}","${d}","${e}"`);
+    }
+    return rows.join('\n');
+  };
+
+  const generateAcademicCitation = () => {
+    const titleClean = docTitle.replace(/[^\w\s]/gi, '');
+    switch (citationStyle) {
+      case 'chicago':
+        return `KaithiLens Historical Archives, ed. "${docTitle}." Transcribed and translated by KaithiLens AI Platform. Bihar Manuscript Digital Collection (${currentYear}). https://github.com/SabaSaiid/KaithiLens.`;
+      case 'apa':
+        return `KaithiLens Historical Archives. (${currentYear}). ${docTitle} [Historical manuscript transcription and English translation]. KaithiLens Digital Humanities Archive. https://github.com/SabaSaiid/KaithiLens`;
+      case 'mla':
+        return `"${docTitle}." KaithiLens Digital Archive, edited by KaithiLens AI, ${currentYear}, github.com/SabaSaiid/KaithiLens.`;
+      case 'bibtex':
+        return `@misc{kaithilens_${titleClean.toLowerCase().replace(/\s+/g, '_')},
+  title        = {${docTitle}},
+  author       = {{KaithiLens Digital Humanities Project}},
+  year         = {${currentYear}},
+  note         = {Historical Kaithi script manuscript transcription, Devanagari transliteration, and English translation},
+  howpublished = {\\url{https://github.com/SabaSaiid/KaithiLens}},
+  keywords     = {Kaithi, Devanagari, Bihar Land Records, Digital Humanities, OCR}
+}`;
+      default:
+        return '';
+    }
   };
 
   const downloadFile = (content, filename, type) => {
@@ -152,6 +237,10 @@ ${(translation?.glossary_terms || [])
 
   const handleDownloadTEI = () => {
     downloadFile(generateTEIXML(), `${docTitle.replace(/\s+/g, '_')}_TEI.xml`, 'application/xml;charset=utf-8');
+  };
+
+  const handleDownloadCSV = () => {
+    downloadFile(generateCSV(), `${docTitle.replace(/\s+/g, '_')}_Ledger.csv`, 'text/csv;charset=utf-8');
   };
 
   const handleDownloadJson = () => {
@@ -183,6 +272,10 @@ ${(translation?.glossary_terms || [])
         return generateMarkdown();
       case 'json':
         return JSON.stringify(pipelineResult, null, 2);
+      case 'csv':
+        return generateCSV();
+      case 'citation':
+        return generateAcademicCitation();
       default:
         return generatePlainText();
     }
@@ -205,10 +298,10 @@ ${(translation?.glossary_terms || [])
             </div>
             <div>
               <h2 className="font-cinzel text-lg font-bold text-slate-900 dark:text-amber-200 tracking-wide">
-                Export Archival Dossier
+                Export Archival Dossier & Research Data
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Download verified transcriptions, digital humanities XML, or print archival certification
+                Download verified transcriptions, digital humanities XML, CSV spreadsheets, and citations
               </p>
             </div>
           </div>
@@ -222,124 +315,118 @@ ${(translation?.glossary_terms || [])
 
         {/* Export Buttons Grid */}
         <div className="p-6 space-y-5 overflow-y-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
             {/* Plain text */}
             <button
               onClick={handleDownloadTxt}
-              className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-amber-500/20 border border-slate-300 dark:border-slate-700 hover:border-amber-500/50 flex flex-col items-center justify-center text-center space-y-1.5 transition-all group shadow-sm"
+              className="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-amber-500/20 border border-slate-300 dark:border-slate-700 hover:border-amber-500/50 flex flex-col items-center justify-center text-center space-y-1 transition-all group shadow-sm"
             >
-              <FileText className="w-6 h-6 text-amber-500 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-200">
-                Plain Text
-              </span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400">.txt report</span>
+              <FileText className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Plain Text</span>
+              <span className="text-[10px] text-slate-400">.txt</span>
             </button>
 
             {/* Markdown */}
             <button
               onClick={handleDownloadMd}
-              className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-amber-500/20 border border-slate-300 dark:border-slate-700 hover:border-amber-500/50 flex flex-col items-center justify-center text-center space-y-1.5 transition-all group shadow-sm"
+              className="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-amber-500/20 border border-slate-300 dark:border-slate-700 hover:border-amber-500/50 flex flex-col items-center justify-center text-center space-y-1 transition-all group shadow-sm"
             >
-              <Scroll className="w-6 h-6 text-amber-500 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-200">
-                Markdown
-              </span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400">.md with tables</span>
+              <Scroll className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Markdown</span>
+              <span className="text-[10px] text-slate-400">.md tables</span>
             </button>
 
             {/* TEI-XML */}
             <button
               onClick={handleDownloadTEI}
-              className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-amber-500/20 border border-slate-300 dark:border-slate-700 hover:border-amber-500/50 flex flex-col items-center justify-center text-center space-y-1.5 transition-all group shadow-sm"
+              className="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-amber-500/20 border border-slate-300 dark:border-slate-700 hover:border-amber-500/50 flex flex-col items-center justify-center text-center space-y-1 transition-all group shadow-sm"
             >
-              <FileCode className="w-6 h-6 text-amber-500 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-200">
-                TEI-XML
-              </span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400">Digital Humanities</span>
+              <FileCode className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">TEI-XML</span>
+              <span className="text-[10px] text-slate-400">Archival std</span>
+            </button>
+
+            {/* CSV Ledger */}
+            <button
+              onClick={handleDownloadCSV}
+              className="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-amber-500/20 border border-slate-300 dark:border-slate-700 hover:border-amber-500/50 flex flex-col items-center justify-center text-center space-y-1 transition-all group shadow-sm"
+            >
+              <Table className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">CSV Table</span>
+              <span className="text-[10px] text-slate-400">Spreadsheet</span>
             </button>
 
             {/* JSON Data */}
             <button
               onClick={handleDownloadJson}
-              className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-amber-500/20 border border-slate-300 dark:border-slate-700 hover:border-amber-500/50 flex flex-col items-center justify-center text-center space-y-1.5 transition-all group shadow-sm"
+              className="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-amber-500/20 border border-slate-300 dark:border-slate-700 hover:border-amber-500/50 flex flex-col items-center justify-center text-center space-y-1 transition-all group shadow-sm"
             >
-              <Code2 className="w-6 h-6 text-amber-500 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-200">
-                JSON Data
-              </span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400">Raw coordinates</span>
+              <Code2 className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">JSON Data</span>
+              <span className="text-[10px] text-slate-400">Full payload</span>
             </button>
           </div>
 
           {/* Archival Print Certificate Action */}
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-300">
-                <Printer className="w-5 h-5" />
+              <div className="seal-badge w-9 h-9 rounded-full flex items-center justify-center text-amber-200 font-kaithi text-sm font-bold shadow-md">
+                𑂍𑂶
               </div>
               <div>
                 <h4 className="font-cinzel text-xs font-bold text-slate-900 dark:text-amber-200">
                   Print Official Archival Dossier / Save as PDF
                 </h4>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                  Formatted certificate with institutional header, dual script columns, and seal
+                  Formatted certificate with seal, structured metadata table, and dual script columns
                 </p>
               </div>
             </div>
             <button
               onClick={handlePrint}
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-all active:scale-95"
+              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-all active:scale-95 flex items-center space-x-1.5"
             >
-              Print / PDF
+              <Printer className="w-3.5 h-3.5" />
+              <span>Print / PDF</span>
             </button>
           </div>
 
           {/* Live Preview Tabs */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-1.5 text-xs">
-                <button
-                  onClick={() => setActivePreviewFormat('text')}
-                  className={`px-2.5 py-1 rounded-lg transition-colors ${
-                    activePreviewFormat === 'text'
-                      ? 'bg-amber-500 text-slate-950 font-bold'
-                      : 'bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400'
-                  }`}
-                >
-                  Plain Text
-                </button>
-                <button
-                  onClick={() => setActivePreviewFormat('md')}
-                  className={`px-2.5 py-1 rounded-lg transition-colors ${
-                    activePreviewFormat === 'md'
-                      ? 'bg-amber-500 text-slate-950 font-bold'
-                      : 'bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400'
-                  }`}
-                >
-                  Markdown
-                </button>
-                <button
-                  onClick={() => setActivePreviewFormat('tei')}
-                  className={`px-2.5 py-1 rounded-lg transition-colors ${
-                    activePreviewFormat === 'tei'
-                      ? 'bg-amber-500 text-slate-950 font-bold'
-                      : 'bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400'
-                  }`}
-                >
-                  TEI-XML
-                </button>
-                <button
-                  onClick={() => setActivePreviewFormat('json')}
-                  className={`px-2.5 py-1 rounded-lg transition-colors ${
-                    activePreviewFormat === 'json'
-                      ? 'bg-amber-500 text-slate-950 font-bold'
-                      : 'bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400'
-                  }`}
-                >
-                  JSON
-                </button>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex bg-slate-200 dark:bg-slate-950 p-0.5 rounded-lg border border-slate-300 dark:border-slate-800 text-xs">
+                {['text', 'md', 'tei', 'csv', 'citation', 'json'].map((fmt) => (
+                  <button
+                    key={fmt}
+                    onClick={() => setActivePreviewFormat(fmt)}
+                    className={`px-2.5 py-1 rounded-md capitalize transition-colors ${
+                      activePreviewFormat === fmt
+                        ? 'bg-amber-500 text-slate-950 font-bold'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-amber-500'
+                    }`}
+                  >
+                    {fmt === 'citation' ? 'Citation' : fmt.toUpperCase()}
+                  </button>
+                ))}
               </div>
+
+              {activePreviewFormat === 'citation' && (
+                <div className="flex items-center space-x-1 text-xs">
+                  {['chicago', 'apa', 'mla', 'bibtex'].map((style) => (
+                    <button
+                      key={style}
+                      onClick={() => setCitationStyle(style)}
+                      className={`px-2 py-0.5 rounded uppercase text-[10px] font-semibold transition-colors ${
+                        citationStyle === style
+                          ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {style}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <button
                 onClick={handleCopyActive}
@@ -359,7 +446,7 @@ ${(translation?.glossary_terms || [])
               </button>
             </div>
 
-            <pre className="p-4 rounded-xl bg-slate-900 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-[11px] font-mono text-slate-200 max-h-48 overflow-y-auto whitespace-pre-wrap leading-relaxed">
+            <pre className="p-4 rounded-xl bg-slate-900 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-[11px] font-mono text-slate-200 max-h-48 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text">
               {getActiveContent()}
             </pre>
           </div>

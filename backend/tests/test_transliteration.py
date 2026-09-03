@@ -74,7 +74,17 @@ class TestKaithiTransliteration(unittest.TestCase):
         self.assertEqual(breakdown[0]["devanagari"], "क")
         self.assertEqual(breakdown[1]["char"], "𑂾")
         self.assertEqual(breakdown[1]["devanagari"], "।")
+        self.assertIn("iast", breakdown[0])
+
+    def test_iast_transliteration(self):
+        from backend.transliteration.kaithi_to_deva import kaithi_to_iast, devanagari_to_iast
+        # Test Devanagari to IAST
+        self.assertEqual(devanagari_to_iast("कमल"), "kamala")
+        self.assertEqual(devanagari_to_iast("श्री"), "śrī")
+        # Test Kaithi to IAST
+        self.assertEqual(kaithi_to_iast("𑂍𑂎𑂏"), "kakhaga")
 
 
 if __name__ == "__main__":
     unittest.main()
+

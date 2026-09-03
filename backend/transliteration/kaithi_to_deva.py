@@ -94,6 +94,116 @@ REVERSE_MAPPING["\u095C"] = "\U0001109B"        # ड़ (precomposed) -> 𑂛
 REVERSE_MAPPING[" "] = " "                      # Preserve space
 
 
+
+# IAST (ISO 15919) Romanization Mappings for Devanagari
+DEVA_TO_IAST_VOWELS: Dict[str, str] = {
+    "अ": "a", "आ": "ā", "इ": "i", "ई": "ī", "उ": "u", "ऊ": "ū",
+    "ऋ": "ṛ", "ए": "e", "ऐ": "ai", "ओ": "o", "औ": "au",
+}
+
+DEVA_TO_IAST_CONSONANTS: Dict[str, str] = {
+    "क": "k", "ख": "kh", "ग": "g", "घ": "gh", "ङ": "ṅ",
+    "च": "c", "छ": "ch", "ज": "j", "झ": "jh", "ञ": "ñ",
+    "ट": "ṭ", "ठ": "ṭh", "ड": "ḍ", "ढ": "ḍh", "ण": "ṇ", "ड़": "ṛ", "ढ़": "ṛh",
+    "त": "t", "थ": "th", "द": "d", "ध": "dh", "न": "n",
+    "प": "p", "फ": "ph", "ब": "b", "भ": "bh", "म": "m",
+    "य": "y", "र": "r", "ल": "l", "व": "v",
+    "श": "ś", "ष": "ṣ", "स": "s", "ह": "h",
+}
+
+DEVA_TO_IAST_MATRAS: Dict[str, str] = {
+    "ा": "ā", "ि": "i", "ी": "ī", "ु": "u", "ू": "ū", "ृ": "ṛ",
+    "े": "e", "ै": "ai", "ो": "o", "ौ": "au",
+}
+
+
+def devanagari_to_iast(text: str) -> str:
+    """
+    Transliterate Devanagari text to academic IAST (ISO 15919) Romanization.
+    Example: 'श्री राम जी सहाय' -> 'śrī rām jī sahāy'
+    """
+    if not text:
+        return ""
+
+    # Normalize to NFC
+    norm_text = unicodedata.normalize("NFC", text)
+    result: List[str] = []
+    i = 0
+    length = len(norm_text)
+
+    while i < length:
+        # Check two-char combinations like ड़ (or precomposed ड़)
+        char = norm_text[i]
+        next_char = norm_text[i + 1] if i + 1 < length else ""
+
+        # Check special combined consonants with nukta
+        if char + next_char in DEVA_TO_IAST_CONSONANTS:
+            base_cons = DEVA_TO_IAST_CONSONANTS[char + next_char]
+            i += 2
+            # Lookahead for matra, virama, or inherent vowel
+            peek = norm_text[i] if i < length else ""
+            if peek in DEVA_TO_IAST_MATRAS:
+                result.append(base_cons + DEVA_TO_IAST_MATRAS[peek])
+                i += 1
+            elif peek == "्":  # Virama (drops inherent vowel)
+                result.append(base_cons)
+                i += 1
+            elif peek == "ं":  # Anusvara
+                result.append(base_cons + "aṃ")
+                i += 1
+            else:
+                result.append(base_cons + "a")
+            continue
+
+        if char in DEVA_TO_IAST_VOWELS:
+            result.append(DEVA_TO_IAST_VOWELS[char])
+            i += 1
+        elif char in DEVA_TO_IAST_CONSONANTS:
+            base_cons = DEVA_TO_IAST_CONSONANTS[char]
+            i += 1
+            peek = norm_text[i] if i < length else ""
+            if peek in DEVA_TO_IAST_MATRAS:
+                result.append(base_cons + DEVA_TO_IAST_MATRAS[peek])
+                i += 1
+            elif peek == "्":  # Virama
+                result.append(base_cons)
+                i += 1
+            elif peek == "ं":  # Anusvara
+                result.append(base_cons + "aṃ")
+                i += 1
+            else:
+                result.append(base_cons + "a")
+        elif char == "ं":
+            result.append("ṃ")
+            i += 1
+        elif char == "ँ":
+            result.append("m̐")
+            i += 1
+        elif char == "ः":
+            result.append("ḥ")
+            i += 1
+        elif char == "।":
+            result.append(".")
+            i += 1
+        elif char == "॥":
+            result.append("||")
+            i += 1
+        else:
+            result.append(char)
+            i += 1
+
+    return "".join(result)
+
+
+def kaithi_to_iast(kaithi_text: str) -> str:
+    """
+    Transliterate Kaithi text directly to academic IAST Romanization
+    via the Devanagari pipeline.
+    """
+    deva = kaithi_to_devanagari(kaithi_text)
+    return devanagari_to_iast(deva)
+
+
 def is_kaithi_text(text: str) -> bool:
     """Check if the string contains any Kaithi Unicode characters."""
     for char in text:
@@ -164,7 +274,7 @@ def devanagari_to_kaithi(text: str) -> str:
 def get_character_breakdown(kaithi_text: str) -> List[Dict[str, Any]]:
     """
     Analyze Kaithi text character by character with Unicode codepoints,
-    names, and corresponding Devanagari equivalents.
+    names, corresponding Devanagari equivalents, and IAST romanization.
     Useful for interactive UI inspection and learning modes.
     """
     breakdown = []
@@ -174,6 +284,7 @@ def get_character_breakdown(kaithi_text: str) -> List[Dict[str, Any]]:
         cp = ord(char)
         is_kaithi = 0x11080 <= cp <= 0x110DF
         deva_equiv = SCRIPT_MAPPING.get(char, char)
+        iast_equiv = devanagari_to_iast(deva_equiv) if deva_equiv else ""
         try:
             name = unicodedata.name(char)
         except ValueError:
@@ -184,6 +295,8 @@ def get_character_breakdown(kaithi_text: str) -> List[Dict[str, Any]]:
             "codepoint": f"U+{cp:04X}",
             "is_kaithi": is_kaithi,
             "devanagari": deva_equiv,
+            "iast": iast_equiv,
             "name": name
         })
     return breakdown
+

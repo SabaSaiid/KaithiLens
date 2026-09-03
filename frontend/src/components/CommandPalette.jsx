@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   BookOpen,
+
   Keyboard,
   Download,
   Edit3,
@@ -13,6 +14,9 @@ import {
   Sparkles,
   X,
   Scale,
+  Terminal,
+  FileDiff,
+  HelpCircle,
 } from 'lucide-react';
 
 export default function CommandPalette({
@@ -26,9 +30,13 @@ export default function CommandPalette({
   onOpenPrimer,
   onOpenKeyboard,
   onOpenLicense,
+  onOpenSandbox,
+  onOpenDiff,
+  onOpenShortcuts,
   onToggleTheme,
   isDark,
 }) {
+
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
@@ -45,6 +53,36 @@ export default function CommandPalette({
 
   const actions = [
     {
+      id: 'sandbox',
+      title: 'Open Live Script Sandbox (Scratchpad)',
+      subtitle: 'Type in Kaithi, Devanagari, or Latin for real-time 3-way transliteration',
+      icon: Terminal,
+      action: () => {
+        if (onOpenSandbox) onOpenSandbox();
+        onClose();
+      },
+    },
+    {
+      id: 'diff',
+      title: 'Compare Document Delta / Revision Diff',
+      subtitle: 'Side-by-side comparison of AI OCR baseline vs archivist corrections',
+      icon: FileDiff,
+      action: () => {
+        if (onOpenDiff) onOpenDiff();
+        onClose();
+      },
+    },
+    {
+      id: 'shortcuts',
+      title: 'View Keyboard Shortcuts Reference',
+      subtitle: 'Quick reference for navigation, canvas manipulation, and audio keys',
+      icon: HelpCircle,
+      action: () => {
+        if (onOpenShortcuts) onOpenShortcuts();
+        onClose();
+      },
+    },
+    {
       id: 'editor',
       title: 'Open Archivist Correction Studio',
       subtitle: 'Review & correct OCR extractions and submit to dataset',
@@ -54,6 +92,7 @@ export default function CommandPalette({
         onClose();
       },
     },
+
     {
       id: 'primer',
       title: 'Open Kaithi Script Academy',
